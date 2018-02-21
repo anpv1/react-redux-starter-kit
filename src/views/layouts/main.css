@@ -1,0 +1,14 @@
+html {
+  font-size: 1em;
+  line-height: normal;
+}
+body {
+  font-family: 'Roboto', sans-serif;
+  font-size: 1em;
+  line-height: normal;
+}
+#sign-out-btn{
+  text-overflow: ellipsis;
+  max-width: 150px;
+  overflow: hidden;
+}
