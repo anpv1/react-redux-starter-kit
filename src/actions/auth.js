@@ -1,4 +1,5 @@
 import { put, call, takeLatest, select } from 'redux-saga/effects';
+import {fetchData} from 'utils/fetch';
 
 export const changeEmail = (email) => {
   return {
@@ -26,19 +27,6 @@ export const onLoginClearError = () => {
   };
 };
 
-function fetchLoginResult(data) {
-  return fetch(`${API_BASE_URL}/login`, {
-    method: 'POST',
-    body: JSON.stringify(data),
-    headers: { 'content-type': 'application/json' }
-  }).then((response) => {
-    return response.json().then(userInfo => (userInfo));
-  })
-    .catch((error) => {
-      throw error;
-    });
-}
-
 function* doAjaxLogin() {
   const data = yield select((state) => {
     return {
@@ -49,7 +37,7 @@ function* doAjaxLogin() {
 
   try {
     yield put({ type: 'LOGIN_START_REQUEST' });
-    const userInfo = yield call(fetchLoginResult, data);
+    const userInfo = yield call(fetchData, {url: '/login', method: 'POST', data: data});
 
     if (userInfo.token) {
       if (typeof (Storage) !== 'undefined') {

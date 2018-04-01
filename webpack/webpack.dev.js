@@ -2,6 +2,8 @@ const webpack = require('webpack');
 console.log('Running on dev environment');
 var config = require('./base.js');
 
+config.watch = true;
+config.mode = 'development';
 config.entry = {app: ['./store.js']};
 config.devtool = 'inline-source-map';
 config.devServer = {
@@ -39,7 +41,6 @@ config.devServer = {
 config.plugins.push(
   new webpack.DefinePlugin({
     'API_BASE_URL': JSON.stringify(''),
-    'process.env.NODE_ENV': JSON.stringify('development'),
   })
 );
 

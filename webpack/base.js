@@ -1,11 +1,12 @@
 var webpack =require('webpack')
 var path = require('path')
 var CopyWebpackPlugin = require('copy-webpack-plugin')
-const ExtractTextPlugin = require('extract-text-webpack-plugin')
+const MiniCssExtractPlugin = require("mini-css-extract-plugin")
+const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
+const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin");
+const WorkboxPlugin = require('workbox-webpack-plugin');
 var src_dir = path.dirname(path.dirname(__filename)) + path.sep + 'src'
 var base_dir = path.dirname(src_dir)
-
-var environment = process.env.NODE_ENV === 'dev' ? 'dev' : 'production';
 
 module.exports = {
     context: src_dir,
@@ -15,6 +16,16 @@ module.exports = {
     },
     resolve: {
         modules: [src_dir, "node_modules"]
+    },
+    optimization: {
+      minimizer: [
+        new UglifyJsPlugin({
+          cache: true,
+          parallel: true,
+          sourceMap: true // set to true if you want JS source maps
+        }),
+        new OptimizeCSSAssetsPlugin({})
+      ]
     },
     module: {
       rules: [
@@ -31,14 +42,17 @@ module.exports = {
         },
         {
           test: /\.css$/,
-          use: ExtractTextPlugin.extract("css-loader")
+          use: [
+            MiniCssExtractPlugin.loader,
+            "css-loader"
+          ]
         },
         {
           test: /\.(png|svg|jpe?g|gif)$/,
           use: [{
             loader: 'file-loader',
             options: {
-              name: environment == 'dev' ? '[hash].[ext]': 'images/[name].[ext]',
+              name: 'images/[name].[ext]',
               publicPath: '/'
             }
           }],
@@ -48,7 +62,7 @@ module.exports = {
           use: [{
             loader: 'file-loader',
             options: {
-              name: environment == 'dev' ? '[hash].[ext]': 'fonts/[name].[ext]',
+              name: 'fonts/[name].[ext]',
               publicPath: '/'
             }
           }]
@@ -56,9 +70,17 @@ module.exports = {
       ]
     },
     plugins: [
-      new ExtractTextPlugin("css/style.css"),
+      new MiniCssExtractPlugin({
+        filename: "css/style.css",
+      }),
       new CopyWebpackPlugin([
         { from: './index.html' }
       ]),
+      new WorkboxPlugin.GenerateSW({
+        // these options encourage the ServiceWorkers to get in there fast 
+        // and not allow any straggling "old" SWs to hang around
+        clientsClaim: true,
+        skipWaiting: true
+      }),
     ]
 }
