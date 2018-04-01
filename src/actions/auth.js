@@ -41,9 +41,6 @@ function* doAjaxLogin() {
 
     if (userInfo.token) {
       if (typeof (Storage) !== 'undefined') {
-        if (localStorage.userName && localStorage.userName !== userInfo.userName) {
-          yield put(onCloseRegister());
-        }
         sessionStorage.jwt_token = userInfo.token;
         localStorage.userName = userInfo.userName;
       } else {
